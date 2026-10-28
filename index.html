@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Rosterplaner Forever · copia local</title>
+  <meta name="description" content="Planificador de roster para World of Warcraft: Forever. Copia local, sin servidor: razas, clases, profesiones, main, talentos y Legado guardados en tu navegador.">
+  <link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">C</div>
+      <div>
+        <strong>Rosterplaner <em>Forever</em></strong>
+        <small data-i18n="tagline">Copia local · sin conexión</small>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn ghost small" id="printBtn" type="button" aria-label="Imprimir" title="Imprimir">🖨</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow" data-i18n="heroEyebrow">Forever · planificador de roster</p>
+      <h1><span data-i18n="heroTitleA">Planifica tu</span> <em data-i18n="heroTitleB">roster</em></h1>
+      <p class="hero-text" data-i18n="heroText">Elige facción, raza y clase (solo combinaciones válidas), dos profesiones principales, secundarias, tu main y los builds de talentos y de Legado. Todo se guarda en este navegador.</p>
+      <div class="hero-stats" id="heroStats" aria-label="Datos del planificador" data-i18n-aria-label="statsAria"></div>
+    </section>
+
+    <nav id="rulesetTabs" class="tabs" aria-label="Reglas de juego" data-i18n-aria-label="rulesAria"></nav>
+
+    <section class="roster-head" aria-labelledby="rosterTitle">
+      <div class="roster-meta">
+        <span class="roster-kicker" id="rosterKicker"></span>
+        <input id="rosterTitle" class="roster-title" type="text" maxlength="60" autocomplete="off" data-i18n-placeholder="titlePlaceholder" data-i18n-aria-label="rosterName" aria-label="Nombre del roster">
+        <p class="save-state" id="saveState" data-state="idle"><span class="save-dot" aria-hidden="true"></span><span id="saveText"></span></p>
+      </div>
+      <div class="toolbar">
+        <button id="shareBtn" class="btn" type="button">🔗 <span data-i18n="share">Compartir</span></button>
+        <button id="exportBtn" class="btn" type="button">⬇ <span data-i18n="export">Exportar</span></button>
+        <label class="btn" for="importFile">⬆ <span data-i18n="import">Importar</span></label>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+        <button id="addBtn" class="btn primary" type="button">＋ <span data-i18n="addCharacter">Añadir personaje</span></button>
+      </div>
+    </section>
+
+    <div id="notice" class="notice" role="status" hidden></div>
+
+    <section id="cards" class="cards" aria-live="polite"></section>
+
+    <section id="stats" class="stats" hidden></section>
+
+    <section class="combos">
+      <div class="combos-head">
+        <p class="eyebrow" data-i18n="combosEyebrow">Referencia</p>
+        <h2 data-i18n="combosTitle">Las 56 combinaciones de raza y clase</h2>
+        <p data-i18n="combosText">Todas las combinaciones válidas de WoW Forever. En verde, las nuevas: mago orco, brujo trol, paladín no-muerto, cazador humano, sacerdote gnomo, chamán enano y los nacidos del cielo, que eligen facción al crearse.</p>
+      </div>
+      <div id="comboMatrix"></div>
+      <div class="combo-legend">
+        <span><strong class="new" data-i18n="new">Nuevo</strong> <span data-i18n="combosLegendNew">= combinación nueva en Forever</span></span>
+        <span><span aria-hidden="true">✓</span> <span data-i18n="combosLegendYes">= posible</span></span>
+        <span><span aria-hidden="true">–</span> <span data-i18n="combosLegendNo">= no posible</span></span>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><strong>Rosterplaner Forever · copia local.</strong> <span data-i18n="footerLine1">Proyecto no oficial, sin conexión con Blizzard ni con chromie.de. Los datos se guardan solo en este navegador.</span></p>
+      <p data-i18n="footerLine2">World of Warcraft y sus nombres son marcas de Blizzard Entertainment. Implementación propia con fines educativos y de uso personal.</p>
+    </footer>
+  </main>
+
+  <div id="modalRoot"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="data.js?v=3"></script>
+  <script src="app.js?v=3"></script>
+</body>
+</html>
