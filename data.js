@@ -22,43 +22,43 @@
   ];
 
   const classes = [
-    { key: "WARRIOR", name: { es: "Guerrero" }, plural: { es: "Guerreros" }, color: "#c69b6d", icon: "⚔️" },
-    { key: "PALADIN", name: { es: "Paladín" }, plural: { es: "Paladines" }, color: "#f48cba", icon: "🛡️" },
-    { key: "HUNTER", name: { es: "Cazador" }, plural: { es: "Cazadores" }, color: "#aad372", icon: "🏹" },
-    { key: "ROGUE", name: { es: "Pícaro" }, plural: { es: "Pícaros" }, color: "#fff468", icon: "🗡️" },
-    { key: "PRIEST", name: { es: "Sacerdote" }, plural: { es: "Sacerdotes" }, color: "#ffffff", icon: "🕯️" },
-    { key: "SHAMAN", name: { es: "Chamán" }, plural: { es: "Chamanes" }, color: "#0070dd", icon: "⚡" },
-    { key: "MAGE", name: { es: "Mago" }, plural: { es: "Magos" }, color: "#3fc7eb", icon: "🔮" },
-    { key: "WARLOCK", name: { es: "Brujo" }, plural: { es: "Brujos" }, color: "#8788ee", icon: "💀" },
-    { key: "DRUID", name: { es: "Druida" }, plural: { es: "Druidas" }, color: "#ff7c0a", icon: "🐻" }
+    { key: "WARRIOR", name: { es: "Guerrero" }, plural: { es: "Guerreros" }, color: "#c69b6d", icon: "icons/classicon_warrior.jpg" },
+    { key: "PALADIN", name: { es: "Paladín" }, plural: { es: "Paladines" }, color: "#f48cba", icon: "icons/classicon_paladin.jpg" },
+    { key: "HUNTER", name: { es: "Cazador" }, plural: { es: "Cazadores" }, color: "#aad372", icon: "icons/classicon_hunter.jpg" },
+    { key: "ROGUE", name: { es: "Pícaro" }, plural: { es: "Pícaros" }, color: "#fff468", icon: "icons/classicon_rogue.jpg" },
+    { key: "PRIEST", name: { es: "Sacerdote" }, plural: { es: "Sacerdotes" }, color: "#ffffff", icon: "icons/classicon_priest.jpg" },
+    { key: "SHAMAN", name: { es: "Chamán" }, plural: { es: "Chamanes" }, color: "#0070dd", icon: "icons/classicon_shaman.jpg" },
+    { key: "MAGE", name: { es: "Mago" }, plural: { es: "Magos" }, color: "#3fc7eb", icon: "icons/classicon_mage.jpg" },
+    { key: "WARLOCK", name: { es: "Brujo" }, plural: { es: "Brujos" }, color: "#8788ee", icon: "icons/classicon_warlock.jpg" },
+    { key: "DRUID", name: { es: "Druida" }, plural: { es: "Druidas" }, color: "#ff7c0a", icon: "icons/classicon_druid.jpg" }
   ];
 
   const races = [
     {
       key: "HUMAN", faction: "ALLIANCE",
       name: { es: "Humano" }, short: { es: "Humano" },
-      icon: "👤",
+      icon: "icons/achievement_character_human_male.jpg",
       classes: ["WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "MAGE", "WARLOCK"],
       newClasses: ["HUNTER"]
     },
     {
       key: "DWARF", faction: "ALLIANCE",
       name: { es: "Enano" }, short: { es: "Enano" },
-      icon: "🍺",
+      icon: "icons/achievement_character_dwarf_male.jpg",
       classes: ["WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN"],
       newClasses: ["SHAMAN"]
     },
     {
       key: "NIGHT_ELF", faction: "ALLIANCE",
       name: { es: "Elfo de la noche" }, short: { es: "Elfo de la noche" },
-      icon: "🌙",
+      icon: "icons/achievement_character_nightelf_male.jpg",
       classes: ["WARRIOR", "HUNTER", "ROGUE", "PRIEST", "DRUID"],
       newClasses: []
     },
     {
       key: "GNOME", faction: "ALLIANCE",
       name: { es: "Gnomo" }, short: { es: "Gnomo" },
-      icon: "🔧",
+      icon: "icons/achievement_character_gnome_male.jpg",
       classes: ["WARRIOR", "ROGUE", "PRIEST", "MAGE", "WARLOCK"],
       newClasses: ["PRIEST"]
     },
@@ -66,7 +66,7 @@
       key: "SKYBORNE_HIGH_ORDER", faction: "ALLIANCE",
       name: { es: "Nacido del cielo del Alto Orden" },
       short: { es: "Alto Orden" },
-      icon: "🪽",
+      icon: "icons/inv_icon_wing01e.jpg",
       classes: ["WARRIOR", "HUNTER", "ROGUE", "MAGE", "DRUID"],
       newClasses: ["WARRIOR", "HUNTER", "ROGUE", "MAGE", "DRUID"],
       isNew: true
@@ -74,28 +74,28 @@
     {
       key: "ORC", faction: "HORDE",
       name: { es: "Orco" }, short: { es: "Orco" },
-      icon: "🪓",
+      icon: "icons/achievement_character_orc_male.jpg",
       classes: ["WARRIOR", "HUNTER", "ROGUE", "SHAMAN", "MAGE", "WARLOCK"],
       newClasses: ["MAGE"]
     },
     {
       key: "UNDEAD", faction: "HORDE",
       name: { es: "No-muerto" }, short: { es: "No-muerto" },
-      icon: "☠️",
+      icon: "icons/achievement_character_undead_male.jpg",
       classes: ["WARRIOR", "PALADIN", "ROGUE", "PRIEST", "MAGE", "WARLOCK"],
       newClasses: ["PALADIN"]
     },
     {
       key: "TAUREN", faction: "HORDE",
       name: { es: "Tauren" }, short: { es: "Tauren" },
-      icon: "🐂",
+      icon: "icons/achievement_character_tauren_male.jpg",
       classes: ["WARRIOR", "HUNTER", "SHAMAN", "DRUID"],
       newClasses: []
     },
     {
       key: "TROLL", faction: "HORDE",
       name: { es: "Troll" }, short: { es: "Troll" },
-      icon: "🦴",
+      icon: "icons/achievement_character_troll_male.jpg",
       classes: ["WARRIOR", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK"],
       newClasses: ["WARLOCK"]
     },
@@ -103,7 +103,7 @@
       key: "SKYBORNE_WINDSHAPER", faction: "HORDE",
       name: { es: "Nacido del cielo Formavientos" },
       short: { es: "Formavientos" },
-      icon: "🌪️",
+      icon: "icons/ability_druid_galewinds.jpg",
       classes: ["WARRIOR", "HUNTER", "ROGUE", "SHAMAN", "DRUID"],
       newClasses: ["WARRIOR", "HUNTER", "ROGUE", "SHAMAN", "DRUID"],
       isNew: true
@@ -111,21 +111,21 @@
   ];
 
   const professions = [
-    { key: "ALCHEMY", kind: "CRAFTING", name: { es: "Alquimia" }, icon: "⚗️", supplier: "HERBALISM" },
-    { key: "BLACKSMITHING", kind: "CRAFTING", name: { es: "Herrería" }, icon: "🔨", supplier: "MINING" },
-    { key: "ENCHANTING", kind: "CRAFTING", name: { es: "Encantamiento" }, icon: "✨", supplier: null },
-    { key: "ENGINEERING", kind: "CRAFTING", name: { es: "Ingeniería" }, icon: "⚙️", supplier: "MINING" },
-    { key: "LEATHERWORKING", kind: "CRAFTING", name: { es: "Peletería" }, icon: "🥾", supplier: "SKINNING" },
-    { key: "TAILORING", kind: "CRAFTING", name: { es: "Sastrería" }, icon: "🧶", supplier: null },
-    { key: "HERBALISM", kind: "GATHERING", name: { es: "Herboristería" }, icon: "🌿", supplier: null },
-    { key: "MINING", kind: "GATHERING", name: { es: "Minería" }, icon: "⛏️", supplier: null },
-    { key: "SKINNING", kind: "GATHERING", name: { es: "Desuello" }, icon: "🔪", supplier: null }
+    { key: "ALCHEMY", kind: "CRAFTING", name: { es: "Alquimia" }, icon: "icons/ui_profession_alchemy.jpg", supplier: "HERBALISM" },
+    { key: "BLACKSMITHING", kind: "CRAFTING", name: { es: "Herrería" }, icon: "icons/ui_profession_blacksmithing.jpg", supplier: "MINING" },
+    { key: "ENCHANTING", kind: "CRAFTING", name: { es: "Encantamiento" }, icon: "icons/ui_profession_enchanting.jpg", supplier: null },
+    { key: "ENGINEERING", kind: "CRAFTING", name: { es: "Ingeniería" }, icon: "icons/ui_profession_engineering.jpg", supplier: "MINING" },
+    { key: "LEATHERWORKING", kind: "CRAFTING", name: { es: "Peletería" }, icon: "icons/ui_profession_leatherworking.jpg", supplier: "SKINNING" },
+    { key: "TAILORING", kind: "CRAFTING", name: { es: "Sastrería" }, icon: "icons/ui_profession_tailoring.jpg", supplier: null },
+    { key: "HERBALISM", kind: "GATHERING", name: { es: "Herboristería" }, icon: "icons/ui_profession_herbalism.jpg", supplier: null },
+    { key: "MINING", kind: "GATHERING", name: { es: "Minería" }, icon: "icons/ui_profession_mining.jpg", supplier: null },
+    { key: "SKINNING", kind: "GATHERING", name: { es: "Desuello" }, icon: "icons/ui_profession_skinning.jpg", supplier: null }
   ];
 
   const secondary = [
-    { key: "COOKING", name: { es: "Cocina" }, icon: "🍳" },
-    { key: "FIRST_AID", name: { es: "Primeros auxilios" }, icon: "🩹" },
-    { key: "FISHING", name: { es: "Pesca" }, icon: "🎣" }
+    { key: "COOKING", name: { es: "Cocina" }, icon: "icons/trade_cooking_2.jpg" },
+    { key: "FIRST_AID", name: { es: "Primeros auxilios" }, icon: "icons/inv_firstaid_bandage.jpg" },
+    { key: "FISHING", name: { es: "Pesca" }, icon: "icons/trade_fishing.jpg" }
   ];
 
   const rulesets = [

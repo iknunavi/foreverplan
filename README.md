@@ -92,6 +92,7 @@ rosterplaner-local/
 ├── styles.css   Tema oscuro, tarjetas, modales y tabla de combinaciones
 ├── data.js      Datos de juego y utilidades (expone window.RP)
 ├── app.js       Estado, render, modales, almacenamiento e importación
+├── icons/       Iconos de clases, razas y profesiones (jpg 64×64)
 ├── start.cmd    Lanzador opcional con servidor local de Python
 └── README.md
 ```
@@ -109,6 +110,7 @@ No hay frameworks, bundler ni peticiones de red.
 ## Personalización
 
 - **Datos de juego**: edita los arrays de `data.js`. Cada entrada usa nombres en español con la forma `{ es: "..." }`.
+- **Iconos**: campo `icon` de cada clase, raza, profesión y secundaria, con la ruta al archivo dentro de `icons/` (por ejemplo `"icons/classicon_warrior.jpg"`).
 - **Colores de clase y facción**: campo `color` de cada clase/facción en `data.js`; el CSS consume `--class-color` y `--faction-color`.
 - **Límites**: objeto `limits` al final de `data.js` (personajes por roster, nombre, nota, título, puntos de Legado).
 - **Textos de interfaz**: objeto `TEXT` al principio de `app.js`, en español.
@@ -131,6 +133,8 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 - Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden; usa Exportar para conservar una copia.
 - Al abrir con `file://`, algunos navegadores limitan `localStorage`. Si necesitas persistencia garantizada, usa `start.cmd` o el servidor local.
 - El proyecto replica la planificación, no sustituye a los calculadores oficiales de talentos.
+- Los iconos de clases, razas y profesiones son recursos gráficos de Blizzard Entertainment tomados del catálogo público de iconos de Wowhead. Se guardan en local (`icons/`), así que la web sigue funcionando sin conexión.
+- Las dos razas nuevas (*Nacido del cielo del Alto Orden* y *Nacido del cielo Formavientos*) no tienen icono propio en el juego: usan una ala y un remolino de viento como referencia temática.
 - World of Warcraft y sus nombres son marcas de Blizzard Entertainment.
 
 ---

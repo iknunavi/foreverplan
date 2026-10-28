@@ -63,6 +63,7 @@
       combosLegendNo: "= no posible",
       footerLine1: "Proyecto no oficial, sin conexión con Blizzard ni con chromie.de. Los datos se guardan solo en este navegador.",
       footerLine2: "World of Warcraft y sus nombres son marcas de Blizzard Entertainment. Implementación propia con fines educativos y de uso personal.",
+      footerLine3: "Los iconos de clases, razas y profesiones son recursos gráficos de Blizzard Entertainment, tomados del catálogo público de iconos de Wowhead.",
       notPossible: "no posible",
       new: "Nuevo",
       main: "Main",
@@ -190,6 +191,11 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function ico(path, extra) {
+    if (!path) return "";
+    return `<img class="ico${extra ? " " + extra : ""}" src="${esc(path)}" alt="" decoding="async">`;
   }
 
   function cleanText(value, max) {
@@ -493,14 +499,14 @@
       .map(([kind, label]) => {
         const options = D.professions
           .filter((entry) => entry.kind === kind)
-          .map((entry) => `<option value="${entry.key}" ${entry.key === value ? "selected" : ""} ${entry.key === other ? "disabled" : ""}>${entry.icon} ${esc(nm(entry))}</option>`)
+          .map((entry) => `<option value="${entry.key}" ${entry.key === value ? "selected" : ""} ${entry.key === other ? "disabled" : ""}>${esc(nm(entry))}</option>`)
           .join("");
         return `<optgroup label="${esc(label)}">${options}</optgroup>`;
       })
       .join("");
 
     return `<div class="prof-select-wrap">
-      <span class="prof-icon" aria-hidden="true">${current ? current.icon : "＋"}</span>
+      <span class="prof-icon" aria-hidden="true">${current ? ico(current.icon) : "＋"}</span>
       <select class="prof-select" data-act="primary" data-slot="${index}" aria-label="${esc(index === 0 ? t("primaryProfessions") : t("secondProfession"))}" ${disabled ? "disabled" : ""}>
         <option value="">${esc(index === 0 ? t("chooseProfession") : t("secondProfession"))}</option>
         ${groups}
@@ -551,13 +557,13 @@
     const secondaryChips = D.secondary.map((entry) => {
       const pressed = character.secondaryProfessions.includes(entry.key);
       return `<button type="button" class="chip" data-act="secondary" data-key="${entry.key}" aria-pressed="${pressed}" title="${esc(nm(entry))}">
-        <span aria-hidden="true">${entry.icon}</span>${esc(nm(entry))}<span class="chip-mark" aria-hidden="true">${pressed ? "✓" : "+"}</span>
+        <span aria-hidden="true">${ico(entry.icon)}</span>${esc(nm(entry))}<span class="chip-mark" aria-hidden="true">${pressed ? "✓" : "+"}</span>
       </button>`;
     }).join("");
 
     return `<article class="card ${character.isMain ? "main" : ""}" data-id="${character.id}" style="--class-color:${cls.color};--faction-color:${faction.color}" aria-label="${esc(`${name}, ${nm(race)} ${nm(cls)}${character.isMain ? " (Main)" : ""}`)}">
       <div class="card-top">
-        <div class="avatar" aria-hidden="true">${race.icon}<span class="class-badge" style="background:${cls.color}">${cls.icon}</span></div>
+        <div class="avatar" aria-hidden="true">${ico(race.icon)}<span class="class-badge" style="background:${cls.color}">${ico(cls.icon)}</span></div>
         <div class="card-id">
           <h3 class="card-name ${named ? "" : "unnamed"}">${esc(name)}</h3>
           <p class="card-sub">${esc(nm(race.short))} · <span style="color:${cls.color}">${esc(nm(cls))}</span>${isNew ? `<span class="badge-new">${esc(t("new"))}</span>` : ""}</p>
@@ -631,7 +637,7 @@
     return `<ul class="bars">${items.map((item) => {
       const pct = total ? Math.round((item.count / total) * 100) : 0;
       return `<li class="bar-row">
-        <span class="bar-icon" aria-hidden="true">${item.icon}</span>
+        <span class="bar-icon" aria-hidden="true">${ico(item.icon)}</span>
         <span class="bar-label">${esc(item.label)}</span>
         <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:${item.count ? Math.max(3, (item.count / max) * 100) : 0}%;background:${item.color}"></span></span>
         <span class="bar-count">${item.count}${item.count ? `<small>${pct}%</small>` : ""}</span>
@@ -676,7 +682,7 @@
       const list = characters.filter((character) => character.primaryProfessions.includes(prof.key));
       if (list.length) covered.add(prof.key);
       return `<div class="prof-cell ${list.length ? "" : "missing"}">
-        <span class="p-icon" aria-hidden="true">${prof.icon}</span>
+        <span class="p-icon" aria-hidden="true">${ico(prof.icon)}</span>
         <div class="p-body">
           <div class="p-name"><span>${esc(nm(prof))}</span><span class="p-count">${list.length ? `${list.length}×` : "—"}</span></div>
           <span class="p-chars">${list.length ? esc(list.map((character) => D.displayName(character)).join(", ")) : esc(prof.kind === "CRAFTING" ? t("crafting") : t("gathering"))}</span>
@@ -709,7 +715,7 @@
 
     const secondaryItems = D.secondary.map((entry) => {
       const count = characters.filter((character) => character.secondaryProfessions.includes(entry.key)).length;
-      return `<li><span aria-hidden="true">${entry.icon}</span><span class="spacer">${esc(nm(entry))}</span><span class="num">${count} / ${total}</span></li>`;
+      return `<li><span aria-hidden="true">${ico(entry.icon)}</span><span class="spacer">${esc(nm(entry))}</span><span class="num">${count} / ${total}</span></li>`;
     }).join("");
 
     const talentCount = characters.filter((character) => character.talentBuild).length;
@@ -748,7 +754,7 @@
   }
 
   function renderCombos() {
-    const header = `<tr><th scope="col">${esc(t("race"))}</th>${D.classes.map((cls) => `<th scope="col" title="${esc(nm(cls))}"><span class="cicon" aria-hidden="true">${cls.icon}</span>${esc(nm(cls))}</th>`).join("")}</tr>`;
+    const header = `<tr><th scope="col">${esc(t("race"))}</th>${D.classes.map((cls) => `<th scope="col" title="${esc(nm(cls))}"><span class="cicon" aria-hidden="true">${ico(cls.icon)}</span>${esc(nm(cls))}</th>`).join("")}</tr>`;
     const rows = [];
 
     D.factions.forEach((faction) => {
@@ -760,7 +766,7 @@
           const fresh = race.newClasses.includes(cls.key);
           return `<td class="ok"><span aria-hidden="true">✓</span>${fresh ? `<span class="new" title="${esc(t("new"))}">${esc(t("new"))}</span>` : ""}</td>`;
         }).join("");
-        rows.push(`<tr><th scope="row" class="race-cell"><span class="race-inner"><span class="race-ico" aria-hidden="true">${race.icon}</span><span class="race-name">${esc(nm(race))}</span></span></th>${cells}</tr>`);
+        rows.push(`<tr><th scope="row" class="race-cell"><span class="race-inner"><span class="race-ico" aria-hidden="true">${ico(race.icon)}</span><span class="race-name">${esc(nm(race))}</span></span></th>${cells}</tr>`);
       });
     });
 
@@ -993,7 +999,7 @@
       : esc(t("pickRace"));
 
     return `<div class="preview">
-      <div class="avatar" aria-hidden="true">${race ? race.icon : "＋"}${cls ? `<span class="class-badge" style="background:${cls.color}">${cls.icon}</span>` : ""}</div>
+      <div class="avatar" aria-hidden="true">${race ? ico(race.icon) : "＋"}${cls ? `<span class="class-badge" style="background:${cls.color}">${ico(cls.icon)}</span>` : ""}</div>
       <div style="min-width:0">
         <div class="preview-name">${esc(fullName || (cls ? nm(cls) : t("previewName")))}</div>
         <div class="preview-sub">${subtitle}</div>
@@ -1018,7 +1024,7 @@
     const raceButtons = raceList.map((race) => {
       const selected = charDraft.raceKey === race.key;
       return `<button type="button" class="choice ${selected ? "selected" : ""}" data-race="${race.key}" aria-pressed="${selected}" style="--choice-color:${D.faction(race.faction).color}">
-        <span class="c-icon" aria-hidden="true">${race.icon}${race.isNew ? `<span class="new-badge">${esc(t("new"))}</span>` : ""}</span>
+        <span class="c-icon" aria-hidden="true">${ico(race.icon)}${race.isNew ? `<span class="new-badge">${esc(t("new"))}</span>` : ""}</span>
         <span class="c-name">${esc(nm(race.short))}</span>
         ${charDraft.faction ? "" : `<span class="c-sub">${esc(nm(D.faction(race.faction)))}</span>`}
       </button>`;
@@ -1031,7 +1037,7 @@
       const selected = charDraft.classKey === cls.key;
       const isNew = charDraft.raceKey ? D.isNewCombo(charDraft.raceKey, cls.key) : false;
       return `<button type="button" class="choice ${selected ? "selected" : ""} ${disabled ? "dimmed" : ""}" data-class="${cls.key}" ${disabled ? "disabled" : ""} aria-pressed="${selected}" title="${esc(nm(cls))}" style="--choice-color:${cls.color}">
-        <span class="c-icon" aria-hidden="true">${cls.icon}${isNew ? `<span class="new-badge">${esc(t("new"))}</span>` : ""}</span>
+        <span class="c-icon" aria-hidden="true">${ico(cls.icon)}${isNew ? `<span class="new-badge">${esc(t("new"))}</span>` : ""}</span>
         <span class="c-name" style="color:${disabled ? "" : cls.color}">${esc(nm(cls))}</span>
       </button>`;
     }).join("");
