@@ -70,7 +70,7 @@ No hay instalación, build ni `npm install`.
 - Descripción por rango al pasar el cursor o el foco, con el estado de los requisitos.
 - Clic para sumar; **Mayús+clic**, clic derecho o pulsación larga para quitar. Un punto no se puede retirar si otro talento depende de él.
 - **El reparto se guarda en el navegador** (`localStorage`, clave `rosterplaner.talentos.v1`) y se recupera al recargar, incluida la última clase abierta. Se guarda una distribución por clase.
-- **Sin códigos de build**: no hay enlaces para compartir, builds de la comunidad ni exportación de la calculadora. Restablecer borra solo la distribución de la clase activa.
+- **Sin códigos de build**: no hay enlaces para compartir ni builds de la comunidad. La copia de seguridad incluye el reparto de talentos. Restablecer borra solo la distribución de la clase activa.
 
 ### Estadísticas y avisos
 
@@ -81,8 +81,8 @@ No hay instalación, build ni `npm install`.
 
 ### Copias de seguridad
 
-- **Exportar**: descarga un JSON con los cuatro rosters.
-- **Importar**: restaura un JSON exportado por esta aplicación.
+- **Exportar**: descarga un JSON con los cuatro rosters y el reparto de talentos (clase activa y puntos por clase).
+- **Importar**: restaura un JSON exportado por esta aplicación. Los archivos antiguos sin talentos siguen funcionando y conservan la calculadora actual; si el bloque de talentos no es válido, se importa solo el roster y se avisa.
 - **Guardado automático** del roster en `localStorage` con la clave `rosterplaner.local.v1`.
 - **Guardado automático** del reparto de talentos en `localStorage` con la clave `rosterplaner.talentos.v1`.
 
@@ -127,6 +127,7 @@ No hay frameworks, bundler ni peticiones de red.
 - **Talentos**: `talents.js` es un JSON con una entrada por clase. Cada talento guarda `row`, `col`, `max`, `need` (puntos requeridos en el árbol), `req` (talento previo y puntos) y `desc` (texto de cada rango). Los árboles se ordenan por las posiciones `row`/`col`.
 - **Colores de clase y facción**: campo `color` de cada clase/facción en `data.js`; el CSS consume `--class-color` y `--faction-color`.
 - **Límites**: objeto `limits` al final de `data.js` (personajes por roster, nombre, nota, título, puntos de Legado).
+- **Copia de seguridad**: el JSON exportado incluye `rulesets`, `active` y `talents` (`version`, `cls` y `alloc`). La importación acepta archivos antiguos sin `talents`.
 - **Textos de interfaz**: objeto `TEXT` al principio de `app.js`, en español.
 - **Aspecto**: variables CSS al inicio de `styles.css` (`--bg`, `--gold`, `--line`, etc.).
 
@@ -144,7 +145,7 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 
 ## Notas y limitaciones
 
-- Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden. Exportar conserva el roster, pero no el reparto de la calculadora.
+- Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden. Exportar conserva el roster y el reparto de talentos.
 - Al abrir con `file://`, algunos navegadores limitan `localStorage`. Si necesitas persistencia garantizada, usa `start.cmd` o el servidor local.
 - El proyecto replica la planificación, no sustituye a los calculadores oficiales de talentos.
 - Los iconos de clases, razas, profesiones y talentos son recursos gráficos de Blizzard Entertainment tomados del catálogo público de iconos de Wowhead. Se guardan en local (`icons/`), así que la web sigue funcionando sin conexión.
@@ -164,7 +165,7 @@ Se ha verificado en un navegador headless (Chromium + Playwright):
 - Reordenación con arrastre y con Alt+flechas, y persistencia tras recargar.
 - Matriz de 10 razas y 56 combinaciones, con nombres traducidos.
 - Pestañas de reglas, bloqueo de facción en PvP e interfaz solo en español.
-- Exportar JSON e importar JSON.
+- Exportar JSON e importar JSON, incluido el reparto de talentos, con compatibilidad para archivos antiguos sin él.
 - Calculadora de talentos: 9 clases, 27 árboles y 465 talentos; puntos, rangos, requisitos, bloqueo de dependencias, reinicio y cambio de clase.
 - Persistencia del reparto de talentos tras recargar, una distribución por clase y rechazo de datos manipulados (puntos fuera de rango, talentos inexistentes, requisitos incumplidos o más de 51 puntos).
 - Sin errores de consola en los flujos probados.

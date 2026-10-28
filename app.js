@@ -153,7 +153,9 @@
       toastDeleted: "{name} eliminado.",
       toastDuplicated: "Personaje duplicado.",
       toastImported: "Roster importado.",
-      toastExported: "Copia exportada como archivo JSON.",
+      toastImportedTalents: "Roster y reparto de talentos importados.",
+      toastExported: "Copia exportada con el roster y el reparto de talentos.",
+      importTalentsError: "El reparto de talentos del archivo no es válido; se ha importado solo el roster.",
       toastMax: "Un roster admite como máximo {n} personajes.",
       toastCopied: "{n} personajes copiados desde {roster}.",
       toastShareImported: "Roster compartido importado ({n} personajes).",
@@ -809,20 +811,24 @@
     return talentView.alloc[key];
   }
 
+  function talentSnapshot() {
+    const alloc = {};
+    TAL.classes.forEach((bundle) => {
+      const current = talentView.alloc[bundle.key];
+      if (!current) return;
+      const clean = {};
+      bundle.trees.forEach((tree) => tree.talents.forEach((talent) => {
+        const points = current[talent.id] || 0;
+        if (points > 0) clean[talent.id] = points;
+      }));
+      if (Object.keys(clean).length) alloc[bundle.key] = clean;
+    });
+    return { version: 1, cls: talentView.cls, alloc };
+  }
+
   function talentSave() {
     try {
-      const alloc = {};
-      TAL.classes.forEach((bundle) => {
-        const current = talentView.alloc[bundle.key];
-        if (!current) return;
-        const clean = {};
-        bundle.trees.forEach((tree) => tree.talents.forEach((talent) => {
-          const points = current[talent.id] || 0;
-          if (points > 0) clean[talent.id] = points;
-        }));
-        if (Object.keys(clean).length) alloc[bundle.key] = clean;
-      });
-      localStorage.setItem(LS_TALENTS, JSON.stringify({ version: 1, cls: talentView.cls, alloc }));
+      localStorage.setItem(LS_TALENTS, JSON.stringify(talentSnapshot()));
     } catch (error) {
       console.error("[rosterplaner] No se pudo guardar la distribución de talentos:", error);
     }
@@ -854,21 +860,41 @@
     return alloc;
   }
 
+  function talentCleanSnapshot(raw) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    if (!raw.alloc || typeof raw.alloc !== "object" || Array.isArray(raw.alloc)) return null;
+    const known = new Set(TAL.classes.map((bundle) => bundle.key));
+    if (!Object.keys(raw.alloc).every((key) => known.has(key))) return null;
+    const alloc = {};
+    for (const bundle of TAL.classes) {
+      const saved = raw.alloc[bundle.key];
+      if (saved === undefined) continue;
+      const clean = talentCleanAlloc(bundle, saved);
+      if (!clean) return null;
+      if (Object.keys(clean).length) alloc[bundle.key] = clean;
+    }
+    return { version: 1, cls: known.has(raw.cls) ? raw.cls : "WARRIOR", alloc };
+  }
+
   function loadTalents() {
     try {
       const raw = localStorage.getItem(LS_TALENTS);
       if (!raw) return;
-      const saved = JSON.parse(raw);
-      if (!saved || typeof saved !== "object") return;
-      if (TAL.classes.some((bundle) => bundle.key === saved.cls)) talentView.cls = saved.cls;
-      if (!saved.alloc || typeof saved.alloc !== "object") return;
-      TAL.classes.forEach((bundle) => {
-        const clean = talentCleanAlloc(bundle, saved.alloc[bundle.key]);
-        if (clean && Object.keys(clean).length) talentView.alloc[bundle.key] = clean;
-      });
+      const saved = talentCleanSnapshot(JSON.parse(raw));
+      if (!saved) return;
+      talentView.cls = saved.cls;
+      talentView.alloc = saved.alloc;
     } catch (error) {
       console.error("[rosterplaner] No se pudo leer la distribución de talentos:", error);
     }
+  }
+
+  function applyTalents(snapshot) {
+    talentView.cls = snapshot.cls;
+    talentView.alloc = snapshot.alloc;
+    hideTalentTip();
+    talentSave();
+    renderTalents();
   }
 
   function talentTreePoints(tree, alloc) {
@@ -1880,7 +1906,8 @@
       app: "rosterplaner-local",
       version: 1,
       exportedAt: new Date().toISOString(),
-      ...state
+      ...state,
+      talents: talentSnapshot()
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const link = document.createElement("a");
@@ -1900,6 +1927,8 @@
       const text = await file.text();
       const parsed = JSON.parse(text);
       let next;
+      const hasTalents = !!(parsed && Object.prototype.hasOwnProperty.call(parsed, "talents"));
+      const importedTalents = hasTalents ? talentCleanSnapshot(parsed.talents) : null;
 
       if (parsed && parsed.rulesets && typeof parsed.rulesets === "object") {
         next = sanitizeState(parsed);
@@ -1917,7 +1946,9 @@
       active = state.active;
       persist();
       render();
-      showToast(t("toastImported"));
+      if (importedTalents) applyTalents(importedTalents);
+      if (hasTalents && !importedTalents) showNotice(t("importTalentsError"));
+      showToast(hasTalents && importedTalents ? t("toastImportedTalents") : t("toastImported"));
     } catch (error) {
       console.error("[rosterplaner] Error al importar:", error);
       showNotice(t("importError"));
