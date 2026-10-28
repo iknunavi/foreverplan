@@ -63,6 +63,14 @@ No hay instalación, build ni `npm install`.
 - **Legado**: reparto visual de puntos en tres árboles (máximo **16**), o código manual (`5-5-6`). Un build con 0 puntos no se guarda.
 - La tarjeta muestra el resumen del build y permite editarlo o quitarlo.
 
+### Calculadora de talentos
+
+- Referencia interactiva de las **9 clases**, con sus **3 árboles** y **465 talentos** en español.
+- **51 puntos** por clase para repartir; los requisitos de fila y de talento previo se respetan: un talento bloqueado no admite puntos hasta cumplirlos.
+- Descripción por rango al pasar el cursor o el foco, con el estado de los requisitos.
+- Clic para sumar; **Mayús+clic**, clic derecho o pulsación larga para quitar. Un punto no se puede retirar si otro talento depende de él.
+- **No guarda builds**: es solo una calculadora en memoria, sin códigos ni enlaces. Al recargar la página empieza de cero.
+
 ### Estadísticas y avisos
 
 - Cobertura de clases y razas.
@@ -91,8 +99,10 @@ rosterplaner-local/
 ├── index.html   Estructura de la página y textos estáticos
 ├── styles.css   Tema oscuro, tarjetas, modales y tabla de combinaciones
 ├── data.js      Datos de juego y utilidades (expone window.RP)
+├── talents.js   Talentos de las 9 clases en español (expone window.RP_TALENTS)
 ├── app.js       Estado, render, modales, almacenamiento e importación
 ├── icons/       Iconos de clases, razas y profesiones (jpg 64×64)
+│   └── talentos/  Iconos de árboles y talentos
 ├── start.cmd    Lanzador opcional con servidor local de Python
 └── README.md
 ```
@@ -100,8 +110,9 @@ rosterplaner-local/
 ### Cómo encaja
 
 1. `data.js` define facciones, clases, razas, profesiones, reglas, árboles de Legado, límites y helpers como `isValidCombo` o `buildSegments`. No toca el DOM.
-2. `app.js` arranca en `DOMContentLoaded`, carga el estado de `localStorage`, renderiza y conecta los eventos.
-3. `index.html` solo contiene la estructura; las partes dinámicas (pestañas, tarjetas, estadísticas, matriz y modales) las pinta `app.js`.
+2. `talents.js` contiene los 27 árboles de talentos con nombres, descripciones por rango, posiciones, rangos máximos y requisitos. Tampoco toca el DOM ni el almacenamiento.
+3. `app.js` arranca en `DOMContentLoaded`, carga el estado de `localStorage`, renderiza y conecta los eventos.
+4. `index.html` solo contiene la estructura; las partes dinámicas (pestañas, tarjetas, estadísticas, matriz, talentos y modales) las pinta `app.js`.
 
 No hay frameworks, bundler ni peticiones de red.
 
@@ -111,6 +122,7 @@ No hay frameworks, bundler ni peticiones de red.
 
 - **Datos de juego**: edita los arrays de `data.js`. Cada entrada usa nombres en español con la forma `{ es: "..." }`.
 - **Iconos**: campo `icon` de cada clase, raza, profesión y secundaria, con la ruta al archivo dentro de `icons/` (por ejemplo `"icons/classicon_warrior.jpg"`).
+- **Talentos**: `talents.js` es un JSON con una entrada por clase. Cada talento guarda `row`, `col`, `max`, `need` (puntos requeridos en el árbol), `req` (talento previo y puntos) y `desc` (texto de cada rango). Los árboles se ordenan por las posiciones `row`/`col`.
 - **Colores de clase y facción**: campo `color` de cada clase/facción en `data.js`; el CSS consume `--class-color` y `--faction-color`.
 - **Límites**: objeto `limits` al final de `data.js` (personajes por roster, nombre, nota, título, puntos de Legado).
 - **Textos de interfaz**: objeto `TEXT` al principio de `app.js`, en español.
@@ -124,7 +136,7 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 
 - **Alt + ↑/↓** con el foco en el asa de arrastre: mueve la tarjeta.
 - **Esc**: cierra el modal abierto.
-- Los emojis son marcadores de posición originales; no se han descargado recursos gráficos de terceros.
+- En la calculadora de talentos: **clic** suma un punto; **Mayús+clic**, **clic derecho** o **pulsación larga** lo quita. **Tab** recorre los talentos y muestra su descripción.
 
 ---
 
@@ -133,7 +145,8 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 - Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden; usa Exportar para conservar una copia.
 - Al abrir con `file://`, algunos navegadores limitan `localStorage`. Si necesitas persistencia garantizada, usa `start.cmd` o el servidor local.
 - El proyecto replica la planificación, no sustituye a los calculadores oficiales de talentos.
-- Los iconos de clases, razas y profesiones son recursos gráficos de Blizzard Entertainment tomados del catálogo público de iconos de Wowhead. Se guardan en local (`icons/`), así que la web sigue funcionando sin conexión.
+- Los iconos de clases, razas, profesiones y talentos son recursos gráficos de Blizzard Entertainment tomados del catálogo público de iconos de Wowhead. Se guardan en local (`icons/`), así que la web sigue funcionando sin conexión.
+- Los datos de talentos (nombres, descripciones y requisitos) son datos de juego de Forever y están en español. La calculadora no guarda builds ni se sincroniza con el roster: los builds de la ficha de personaje siguen siendo códigos de texto independientes.
 - Las dos razas nuevas (*Nacido del cielo del Alto Orden* y *Nacido del cielo Formavientos*) no tienen icono propio en el juego: usan una ala y un remolino de viento como referencia temática.
 - World of Warcraft y sus nombres son marcas de Blizzard Entertainment.
 
@@ -150,4 +163,5 @@ Se ha verificado en un navegador headless (Chromium + Playwright):
 - Matriz de 10 razas y 56 combinaciones, con nombres traducidos.
 - Pestañas de reglas, bloqueo de facción en PvP e interfaz solo en español.
 - Exportar JSON e importar JSON.
+- Calculadora de talentos: 9 clases, 27 árboles y 465 talentos; puntos, rangos, requisitos, bloqueo de dependencias, reinicio y cambio de clase.
 - Sin errores de consola en los flujos probados.

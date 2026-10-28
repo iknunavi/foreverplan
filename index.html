@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark">
   <title>Rosterplaner Forever · copia local</title>
   <meta name="description" content="Planificador de roster para World of Warcraft: Forever. Copia local, sin servidor: razas, clases, profesiones, main, talentos y Legado guardados en tu navegador.">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <header class="topbar">
@@ -63,17 +63,34 @@
       </div>
     </section>
 
+    <section id="talents" class="talents">
+      <div class="combos-head">
+        <p class="eyebrow" data-i18n="talentsEyebrow">Calculadora</p>
+        <h2 data-i18n="talentsTitle">Talentos por clase</h2>
+        <p data-i18n="talentsText">Elige una clase y reparte sus 51 puntos entre los tres árboles. Pasa el cursor o el foco por un talento para ver su descripción y sus requisitos. No se guarda ningún build: es solo una calculadora.</p>
+      </div>
+      <div id="talentClassTabs" class="talent-classes" role="group" aria-label="Clases" data-i18n-aria-label="talentsClassesAria"></div>
+      <div class="talent-bar">
+        <p class="talent-left"><span data-i18n="talentPointsLeft">Puntos restantes</span> <strong id="talentRemaining">51</strong></p>
+        <button id="talentReset" class="btn" type="button" data-i18n="talentReset">Restablecer</button>
+      </div>
+      <div id="talentTrees" class="talent-trees"></div>
+      <p class="talent-hint" data-i18n="talentHint">Clic para sumar un punto. Mayús+clic, clic derecho o pulsación larga para quitarlo.</p>
+      <div id="talentTip" class="talent-tip" hidden></div>
+    </section>
+
     <footer class="footer">
       <p><strong>Rosterplaner Forever · copia local.</strong> <span data-i18n="footerLine1">Proyecto no oficial, sin conexión con Blizzard ni con chromie.de. Los datos se guardan solo en este navegador.</span></p>
       <p data-i18n="footerLine2">World of Warcraft y sus nombres son marcas de Blizzard Entertainment. Implementación propia con fines educativos y de uso personal.</p>
-      <p data-i18n="footerLine3">Los iconos de clases, razas y profesiones son recursos gráficos de Blizzard Entertainment, tomados del catálogo público de iconos de Wowhead.</p>
+      <p data-i18n="footerLine3">Los iconos de clases, razas, profesiones y talentos son recursos gráficos de Blizzard Entertainment, tomados del catálogo público de iconos de Wowhead.</p>
     </footer>
   </main>
 
   <div id="modalRoot"></div>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="data.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <script src="data.js?v=7"></script>
+  <script src="talents.js?v=7"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

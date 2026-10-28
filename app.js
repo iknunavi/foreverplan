@@ -61,9 +61,26 @@
       combosLegendNew: "= combinación nueva en Forever",
       combosLegendYes: "= posible",
       combosLegendNo: "= no posible",
+      talentsEyebrow: "Calculadora",
+      talentsTitle: "Talentos por clase",
+      talentsText: "Elige una clase y reparte sus 51 puntos entre los tres árboles. Pasa el cursor o el foco por un talento para ver su descripción y sus requisitos. No se guarda ningún build: es solo una calculadora.",
+      talentsClassesAria: "Clases para la calculadora de talentos",
+      talentPointsLeft: "Puntos restantes",
+      talentReset: "Restablecer",
+      talentHint: "Clic para sumar un punto. Mayús+clic, clic derecho o pulsación larga para quitarlo.",
+      talentRank: "Rango {n} de {max}",
+      talentMaxRank: "Rango máximo",
+      talentNextRank: "Siguiente rango",
+      talentCurrentRank: "Rango actual",
+      talentRequiresTree: "Requiere {n} puntos en {tree}",
+      talentRequiresTalent: "Requiere {n} en {talent}",
+      talentNoPoints: "No quedan puntos de talento",
+      talentLocked: "Ese talento todavía no está disponible.",
+      talentBlockedRemove: "No puedes quitar ese punto: otro talento depende de él.",
+      talentTreeAria: "Árbol de talentos: {tree}",
       footerLine1: "Proyecto no oficial, sin conexión con Blizzard ni con chromie.de. Los datos se guardan solo en este navegador.",
       footerLine2: "World of Warcraft y sus nombres son marcas de Blizzard Entertainment. Implementación propia con fines educativos y de uso personal.",
-      footerLine3: "Los iconos de clases, razas y profesiones son recursos gráficos de Blizzard Entertainment, tomados del catálogo público de iconos de Wowhead.",
+      footerLine3: "Los iconos de clases, razas, profesiones y talentos son recursos gráficos de Blizzard Entertainment, tomados del catálogo público de iconos de Wowhead.",
       notPossible: "no posible",
       new: "Nuevo",
       main: "Main",
@@ -771,6 +788,358 @@
     });
 
     el.comboMatrix.innerHTML = `<div class="table-scroll"><table class="combo-table"><thead>${header}</thead><tbody>${rows.join("")}</tbody></table></div>`;
+  }
+
+  /* ---------------- talentos ---------------- */
+
+  const TAL = window.RP_TALENTS || { classes: [] };
+  const TAL_MAX = 51;
+  const talentView = { cls: "WARRIOR", alloc: {} };
+  let talentTipTarget = null;
+  let talentHoldTimer = null;
+  let talentHoldDone = false;
+
+  function talentBundle(key) {
+    return TAL.classes.find((entry) => entry.key === key) || TAL.classes[0] || null;
+  }
+
+  function talentAlloc(key) {
+    if (!talentView.alloc[key]) talentView.alloc[key] = {};
+    return talentView.alloc[key];
+  }
+
+  function talentTreePoints(tree, alloc) {
+    return tree.talents.reduce((sum, talent) => sum + (alloc[talent.id] || 0), 0);
+  }
+
+  function talentSpent(alloc) {
+    return Object.keys(alloc).reduce((sum, key) => sum + alloc[key], 0);
+  }
+
+  function talentOpen(tree, talent, alloc) {
+    if (talentTreePoints(tree, alloc) < talent.need) return false;
+    return talent.req.every(([id, qty]) => (alloc[id] || 0) >= qty);
+  }
+
+  function talentTileState(tree, talent, alloc) {
+    const points = alloc[talent.id] || 0;
+    if (points >= talent.max) return "max";
+    if (points > 0) return "partial";
+    return talentOpen(tree, talent, alloc) ? "open" : "locked";
+  }
+
+  function talentTipHtml(tree, talent, alloc) {
+    const points = alloc[talent.id] || 0;
+    const top = points >= talent.max;
+    const text = talent.desc[top ? talent.max - 1 : points] || "";
+    const meta = `${t("talentRank", { n: points, max: talent.max })} · ${top ? t("talentMaxRank") : t("talentNextRank")}`;
+    const reqs = [];
+    if (talent.need) reqs.push(t("talentRequiresTree", { n: talent.need, tree: tree.name }));
+    talent.req.forEach(([id, qty]) => {
+      const req = tree.talents.find((entry) => entry.id === id);
+      if (req) reqs.push(t("talentRequiresTalent", { n: qty, talent: req.name }));
+    });
+    const ok = talentOpen(tree, talent, alloc);
+    return `<p class="tip-name">${esc(talent.name)}</p>
+      <p class="tip-meta">${esc(meta)}</p>
+      <p class="tip-desc">${esc(text)}</p>
+      ${reqs.length ? `<p class="tip-req ${ok ? "ok" : "bad"}">${reqs.map(esc).join("<br>")}</p>` : ""}`;
+  }
+
+  function renderTalents() {
+    if (!TAL.classes.length) return;
+    el.talentClassTabs.innerHTML = TAL.classes.map((bundle) => {
+      const cls = D.cls(bundle.key);
+      return `<button type="button" class="talent-class" data-talent-class="${bundle.key}" aria-pressed="${bundle.key === talentView.cls}" style="--class-color:${cls ? cls.color : "#888"}">
+        ${cls ? ico(cls.icon) : ""}<span>${esc(cls ? nm(cls) : bundle.key)}</span>
+      </button>`;
+    }).join("");
+    renderTalentTrees();
+    renderTalentBar();
+  }
+
+  function renderTalentTrees() {
+    const bundle = talentBundle(talentView.cls);
+    if (!bundle) {
+      el.talentTrees.innerHTML = "";
+      return;
+    }
+    const alloc = talentAlloc(bundle.key);
+    el.talentTrees.innerHTML = bundle.trees.map((tree) => {
+      const points = talentTreePoints(tree, alloc);
+      const tiles = tree.talents.map((talent) => {
+        const value = alloc[talent.id] || 0;
+        return `<button type="button" class="talent" data-talent="${talent.id}" data-state="${talentTileState(tree, talent, alloc)}"
+          style="grid-row:${talent.row + 1};grid-column:${talent.col + 1}"
+          aria-label="${esc(`${talent.name}, ${t("talentRank", { n: value, max: talent.max })}`)}">
+          <img src="${esc(talent.icon)}" alt="" loading="lazy" decoding="async" draggable="false">
+          <span class="talent-rank" aria-hidden="true">${value}/${talent.max}</span>
+        </button>`;
+      }).join("");
+      return `<article class="talent-tree" aria-label="${esc(t("talentTreeAria", { tree: tree.name }))}">
+        <header class="talent-tree-head">
+          ${ico(tree.icon, "tree-ico")}
+          <h3>${esc(tree.name)}</h3>
+          <span class="talent-tree-pts" data-tree-pts>${points} / ${TAL_MAX}</span>
+        </header>
+        <div class="talent-grid-wrap">
+          <svg class="talent-links" aria-hidden="true"></svg>
+          <div class="talent-grid">${tiles}</div>
+        </div>
+      </article>`;
+    }).join("");
+    drawTalentLinks();
+  }
+
+  function renderTalentBar() {
+    const alloc = talentAlloc(talentView.cls);
+    el.talentRemaining.textContent = String(Math.max(0, TAL_MAX - talentSpent(alloc)));
+  }
+
+  function drawTalentLinks() {
+    const bundle = talentBundle(talentView.cls);
+    if (!bundle) return;
+    const svgNS = "http://www.w3.org/2000/svg";
+    Array.prototype.forEach.call(el.talentTrees.querySelectorAll(".talent-tree"), (treeEl, index) => {
+      const tree = bundle.trees[index];
+      const wrap = treeEl.querySelector(".talent-grid-wrap");
+      const svg = treeEl.querySelector(".talent-links");
+      if (!tree || !wrap || !svg) return;
+      const box = wrap.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+      const centers = {};
+      Array.prototype.forEach.call(treeEl.querySelectorAll(".talent[data-talent]"), (tile) => {
+        const rect = tile.getBoundingClientRect();
+        centers[tile.dataset.talent] = {
+          x: rect.left - box.left + rect.width / 2,
+          y: rect.top - box.top + rect.height / 2,
+        };
+      });
+      svg.innerHTML = "";
+      tree.talents.forEach((talent) => {
+        talent.req.forEach(([id]) => {
+          const from = centers[id];
+          const to = centers[talent.id];
+          if (!from || !to) return;
+          const line = document.createElementNS(svgNS, "line");
+          line.setAttribute("x1", from.x);
+          line.setAttribute("y1", from.y);
+          line.setAttribute("x2", to.x);
+          line.setAttribute("y2", to.y);
+          svg.appendChild(line);
+        });
+      });
+    });
+  }
+
+  function refreshTalents() {
+    const bundle = talentBundle(talentView.cls);
+    if (!bundle) return;
+    const alloc = talentAlloc(bundle.key);
+    Array.prototype.forEach.call(el.talentTrees.querySelectorAll(".talent-tree"), (treeEl, index) => {
+      const tree = bundle.trees[index];
+      if (!tree) return;
+      const head = treeEl.querySelector("[data-tree-pts]");
+      if (head) head.textContent = `${talentTreePoints(tree, alloc)} / ${TAL_MAX}`;
+      Array.prototype.forEach.call(treeEl.querySelectorAll(".talent[data-talent]"), (tile) => {
+        const talent = tree.talents.find((entry) => entry.id === tile.dataset.talent);
+        if (!talent) return;
+        const points = alloc[talent.id] || 0;
+        tile.dataset.state = talentTileState(tree, talent, alloc);
+        const rank = tile.querySelector(".talent-rank");
+        if (rank) rank.textContent = `${points}/${talent.max}`;
+        tile.setAttribute("aria-label", `${talent.name}, ${t("talentRank", { n: points, max: talent.max })}`);
+      });
+    });
+    renderTalentBar();
+    if (talentTipTarget) showTalentTip(talentTipTarget);
+  }
+
+  function talentContext(tile) {
+    const bundle = talentBundle(talentView.cls);
+    const treeEl = tile.closest(".talent-tree");
+    if (!bundle || !treeEl) return null;
+    const index = Array.prototype.indexOf.call(el.talentTrees.children, treeEl);
+    const tree = bundle.trees[index];
+    if (!tree) return null;
+    const talent = tree.talents.find((entry) => entry.id === tile.dataset.talent);
+    if (!talent) return null;
+    return { tree, talent, alloc: talentAlloc(bundle.key) };
+  }
+
+  function positionTalentTip(tile) {
+    const section = el.talents.getBoundingClientRect();
+    const rect = tile.getBoundingClientRect();
+    const tip = el.talentTip;
+    const width = tip.offsetWidth;
+    const height = tip.offsetHeight;
+    let left = rect.left - section.left + rect.width / 2 - width / 2;
+    left = Math.max(8, Math.min(left, section.width - width - 8));
+    let top = rect.bottom - section.top + 8;
+    if (rect.bottom + height + 16 > window.innerHeight && rect.top - height - 8 > 0) {
+      top = rect.top - section.top - height - 8;
+    }
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
+  }
+
+  function showTalentTip(tile) {
+    const ctx = talentContext(tile);
+    if (!ctx) return;
+    talentTipTarget = tile;
+    el.talentTip.innerHTML = talentTipHtml(ctx.tree, ctx.talent, ctx.alloc);
+    el.talentTip.hidden = false;
+    positionTalentTip(tile);
+  }
+
+  function hideTalentTip() {
+    talentTipTarget = null;
+    el.talentTip.hidden = true;
+  }
+
+  function talentAdd(tile) {
+    const ctx = talentContext(tile);
+    if (!ctx) return;
+    const { tree, talent, alloc } = ctx;
+    const points = alloc[talent.id] || 0;
+    if (points >= talent.max) return;
+    if (talentSpent(alloc) >= TAL_MAX) {
+      showToast(t("talentNoPoints"));
+      return;
+    }
+    if (!talentOpen(tree, talent, alloc)) {
+      const need = [];
+      if (talent.need) need.push(t("talentRequiresTree", { n: talent.need, tree: tree.name }));
+      talent.req.forEach(([id, qty]) => {
+        const req = tree.talents.find((entry) => entry.id === id);
+        if (req) need.push(t("talentRequiresTalent", { n: qty, talent: req.name }));
+      });
+      showToast(need.length ? need.join(" · ") : t("talentLocked"));
+      return;
+    }
+    alloc[talent.id] = points + 1;
+    refreshTalents();
+  }
+
+  function talentRemove(tile) {
+    const ctx = talentContext(tile);
+    if (!ctx) return;
+    const { tree, talent, alloc } = ctx;
+    const points = alloc[talent.id] || 0;
+    if (!points) return;
+    const next = points - 1;
+    const treeAfter = talentTreePoints(tree, alloc) - 1;
+    const blocked = tree.talents.some((other) => {
+      if (other.id === talent.id || !(alloc[other.id] || 0)) return false;
+      if (treeAfter < other.need) return true;
+      return other.req.some(([id, qty]) => id === talent.id && next < qty);
+    });
+    if (blocked) {
+      showToast(t("talentBlockedRemove"));
+      return;
+    }
+    if (next > 0) alloc[talent.id] = next;
+    else delete alloc[talent.id];
+    refreshTalents();
+  }
+
+  function switchTalentClass(key) {
+    if (key === talentView.cls || !talentBundle(key)) return;
+    hideTalentTip();
+    talentView.cls = key;
+    Array.prototype.forEach.call(el.talentClassTabs.querySelectorAll("[data-talent-class]"), (button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.talentClass === key));
+    });
+    renderTalentTrees();
+    renderTalentBar();
+  }
+
+  function resetTalents() {
+    const alloc = talentAlloc(talentView.cls);
+    Object.keys(alloc).forEach((key) => { delete alloc[key]; });
+    hideTalentTip();
+    refreshTalents();
+  }
+
+  function bindTalents() {
+    el.talents.addEventListener("click", (event) => {
+      const classButton = event.target.closest("[data-talent-class]");
+      if (classButton) {
+        switchTalentClass(classButton.dataset.talentClass);
+        return;
+      }
+      if (event.target.closest("#talentReset")) {
+        resetTalents();
+        return;
+      }
+      const tile = event.target.closest(".talent[data-talent]");
+      if (!tile) return;
+      if (talentHoldDone) {
+        talentHoldDone = false;
+        return;
+      }
+      if (event.shiftKey || event.altKey) talentRemove(tile);
+      else talentAdd(tile);
+    });
+
+    el.talents.addEventListener("contextmenu", (event) => {
+      const tile = event.target.closest(".talent[data-talent]");
+      if (!tile) return;
+      event.preventDefault();
+      talentRemove(tile);
+    });
+
+    el.talents.addEventListener("pointerdown", (event) => {
+      const tile = event.target.closest(".talent[data-talent]");
+      if (!tile || event.button !== 0) return;
+      talentHoldDone = false;
+      clearTimeout(talentHoldTimer);
+      talentHoldTimer = setTimeout(() => {
+        talentHoldDone = true;
+        talentRemove(tile);
+      }, 550);
+    });
+
+    ["pointerup", "pointerleave", "pointercancel"].forEach((type) => {
+      el.talents.addEventListener(type, () => {
+        clearTimeout(talentHoldTimer);
+        talentHoldTimer = null;
+      });
+    });
+
+    el.talents.addEventListener("mouseover", (event) => {
+      const tile = event.target.closest(".talent[data-talent]");
+      if (!tile || tile === talentTipTarget) return;
+      showTalentTip(tile);
+    });
+
+    el.talents.addEventListener("mouseout", (event) => {
+      const tile = event.target.closest(".talent[data-talent]");
+      if (!tile) return;
+      const next = event.relatedTarget && event.relatedTarget.closest ? event.relatedTarget.closest(".talent[data-talent]") : null;
+      if (next === tile) return;
+      if (!next) hideTalentTip();
+    });
+
+    el.talents.addEventListener("focusin", (event) => {
+      const tile = event.target.closest(".talent[data-talent]");
+      if (tile) showTalentTip(tile);
+    });
+
+    el.talents.addEventListener("focusout", (event) => {
+      if (event.target.closest(".talent[data-talent]")) hideTalentTip();
+    });
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        drawTalentLinks();
+        if (talentTipTarget) positionTalentTip(talentTipTarget);
+      }, 120);
+    });
+    window.addEventListener("load", drawTalentLinks);
   }
 
   /* ---------------- acciones sobre el roster ---------------- */
@@ -1643,6 +2012,11 @@
     el.cards = document.getElementById("cards");
     el.stats = document.getElementById("stats");
     el.comboMatrix = document.getElementById("comboMatrix");
+    el.talents = document.getElementById("talents");
+    el.talentClassTabs = document.getElementById("talentClassTabs");
+    el.talentTrees = document.getElementById("talentTrees");
+    el.talentRemaining = document.getElementById("talentRemaining");
+    el.talentTip = document.getElementById("talentTip");
     el.modalRoot = document.getElementById("modalRoot");
     el.toast = document.getElementById("toast");
     el.notice = document.getElementById("notice");
@@ -1665,6 +2039,8 @@
     el.cards.addEventListener("click", onCardsClick);
     el.cards.addEventListener("change", onCardsChange);
     bindDragAndDrop();
+    bindTalents();
+    renderTalents();
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && el.modalRoot.innerHTML) closeModal();
