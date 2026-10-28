@@ -1152,22 +1152,3 @@ table.combo-table { width: 100%; border-collapse: collapse; min-width: 860px; }
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   html { scroll-behavior: auto; }
 }
-
-/* ---------- Print ---------- */
-@media print {
-  :root { --bg: #fff; --text: #111; --text-soft: #222; --muted: #444; --faint: #666; --line: #ddd; --line-strong: #bbb; --panel: #fff; --panel-solid: #fff; }
-  body { background: #fff; color: #111; }
-  body::before, .topbar, .hero, .tabs, .roster-head, .notice, .toolbar, .add-tile, .modal-backdrop, .toast, .footer { display: none !important; }
-  .wrap { width: 100%; padding: 0; }
-  .cards { display: block; margin: 0; }
-  .card { break-inside: avoid; margin-bottom: 10px; border: 1px solid #ccc; box-shadow: none; background: #fff; }
-  .card::before { display: none; }
-  .build-empty, .build-filled, .prof-select, .chip, .avatar { border-color: #ccc; background: #fff; color: #111; }
-  .stats { margin-top: 16px; }
-  .stats-grid, .panel-split { display: block; }
-  .panel { break-inside: avoid; border: 1px solid #ccc; background: #fff; margin-bottom: 10px; }
-  .bar-track { background: #eee; }
-  .combos { display: none; }
-  .combo-table { min-width: 0; }
-  a { color: #111; }
-}
