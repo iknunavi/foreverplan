@@ -872,7 +872,7 @@
         return `<button type="button" class="talent" data-talent="${talent.id}" data-state="${talentTileState(tree, talent, alloc)}"
           style="grid-row:${talent.row + 1};grid-column:${talent.col + 1}"
           aria-label="${esc(`${talent.name}, ${t("talentRank", { n: value, max: talent.max })}`)}">
-          <img src="${esc(talent.icon)}" alt="" loading="lazy" decoding="async" draggable="false">
+          <img src="${esc(talent.icon)}" alt="" decoding="async" draggable="false">
           <span class="talent-rank" aria-hidden="true">${value}/${talent.max}</span>
         </button>`;
       }).join("");
