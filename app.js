@@ -7,6 +7,7 @@
 
   const D = window.RP;
   const LS_STATE = "rosterplaner.local.v1";
+  const LS_TALENTS = "rosterplaner.talentos.v1";
   const BUILD_RE = /^[0-9-]{1,200}$/;
 
   const TEXT = {
@@ -63,11 +64,11 @@
       combosLegendNo: "= no posible",
       talentsEyebrow: "Calculadora",
       talentsTitle: "Talentos por clase",
-      talentsText: "Elige una clase y reparte sus 51 puntos entre los tres árboles. Pasa el cursor o el foco por un talento para ver su descripción y sus requisitos. No se guarda ningún build: es solo una calculadora.",
+      talentsText: "Elige una clase y reparte sus 51 puntos entre los tres árboles. Pasa el cursor o el foco por un talento para ver su descripción y sus requisitos. Tu reparto se guarda en este navegador; no hay códigos de build.",
       talentsClassesAria: "Clases para la calculadora de talentos",
       talentPointsLeft: "Puntos restantes",
       talentReset: "Restablecer",
-      talentHint: "Clic para sumar un punto. Mayús+clic, clic derecho o pulsación larga para quitarlo.",
+      talentHint: "Clic para sumar un punto. Mayús+clic, clic derecho o pulsación larga para quitarlo. El reparto se guarda solo en este navegador.",
       talentRank: "Rango {n} de {max}",
       talentMaxRank: "Rango máximo",
       talentNextRank: "Siguiente rango",
@@ -808,6 +809,68 @@
     return talentView.alloc[key];
   }
 
+  function talentSave() {
+    try {
+      const alloc = {};
+      TAL.classes.forEach((bundle) => {
+        const current = talentView.alloc[bundle.key];
+        if (!current) return;
+        const clean = {};
+        bundle.trees.forEach((tree) => tree.talents.forEach((talent) => {
+          const points = current[talent.id] || 0;
+          if (points > 0) clean[talent.id] = points;
+        }));
+        if (Object.keys(clean).length) alloc[bundle.key] = clean;
+      });
+      localStorage.setItem(LS_TALENTS, JSON.stringify({ version: 1, cls: talentView.cls, alloc }));
+    } catch (error) {
+      console.error("[rosterplaner] No se pudo guardar la distribución de talentos:", error);
+    }
+  }
+
+  function talentCleanAlloc(bundle, saved) {
+    if (!saved || typeof saved !== "object" || Array.isArray(saved)) return null;
+    const byId = new Map();
+    bundle.trees.forEach((tree) => tree.talents.forEach((talent) => byId.set(talent.id, { tree, talent })));
+    const alloc = {};
+    let total = 0;
+    const keys = Object.keys(saved);
+    for (let i = 0; i < keys.length; i += 1) {
+      const entry = byId.get(keys[i]);
+      const value = saved[keys[i]];
+      if (!entry || !Number.isInteger(value) || value < 1 || value > entry.talent.max) return null;
+      alloc[keys[i]] = value;
+      total += value;
+    }
+    if (total > TAL_MAX) return null;
+    const ids = Object.keys(alloc);
+    for (let i = 0; i < ids.length; i += 1) {
+      const { tree, talent } = byId.get(ids[i]);
+      if (talentTreePoints(tree, alloc) < talent.need) return null;
+      for (let r = 0; r < talent.req.length; r += 1) {
+        if ((alloc[talent.req[r][0]] || 0) < talent.req[r][1]) return null;
+      }
+    }
+    return alloc;
+  }
+
+  function loadTalents() {
+    try {
+      const raw = localStorage.getItem(LS_TALENTS);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (!saved || typeof saved !== "object") return;
+      if (TAL.classes.some((bundle) => bundle.key === saved.cls)) talentView.cls = saved.cls;
+      if (!saved.alloc || typeof saved.alloc !== "object") return;
+      TAL.classes.forEach((bundle) => {
+        const clean = talentCleanAlloc(bundle, saved.alloc[bundle.key]);
+        if (clean && Object.keys(clean).length) talentView.alloc[bundle.key] = clean;
+      });
+    } catch (error) {
+      console.error("[rosterplaner] No se pudo leer la distribución de talentos:", error);
+    }
+  }
+
   function talentTreePoints(tree, alloc) {
     return tree.talents.reduce((sum, talent) => sum + (alloc[talent.id] || 0), 0);
   }
@@ -1019,6 +1082,7 @@
       return;
     }
     alloc[talent.id] = points + 1;
+    talentSave();
     refreshTalents();
   }
 
@@ -1041,6 +1105,7 @@
     }
     if (next > 0) alloc[talent.id] = next;
     else delete alloc[talent.id];
+    talentSave();
     refreshTalents();
   }
 
@@ -1048,6 +1113,7 @@
     if (key === talentView.cls || !talentBundle(key)) return;
     hideTalentTip();
     talentView.cls = key;
+    talentSave();
     Array.prototype.forEach.call(el.talentClassTabs.querySelectorAll("[data-talent-class]"), (button) => {
       button.setAttribute("aria-pressed", String(button.dataset.talentClass === key));
     });
@@ -1059,6 +1125,7 @@
     const alloc = talentAlloc(talentView.cls);
     Object.keys(alloc).forEach((key) => { delete alloc[key]; });
     hideTalentTip();
+    talentSave();
     refreshTalents();
   }
 
@@ -2040,6 +2107,7 @@
     el.cards.addEventListener("change", onCardsChange);
     bindDragAndDrop();
     bindTalents();
+    loadTalents();
     renderTalents();
 
     document.addEventListener("keydown", (event) => {

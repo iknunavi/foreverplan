@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark">
   <title>Rosterplaner Forever · copia local</title>
   <meta name="description" content="Planificador de roster para World of Warcraft: Forever. Copia local, sin servidor: razas, clases, profesiones, main, talentos y Legado guardados en tu navegador.">
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
   <header class="topbar">
@@ -67,7 +67,7 @@
       <div class="combos-head">
         <p class="eyebrow" data-i18n="talentsEyebrow">Calculadora</p>
         <h2 data-i18n="talentsTitle">Talentos por clase</h2>
-        <p data-i18n="talentsText">Elige una clase y reparte sus 51 puntos entre los tres árboles. Pasa el cursor o el foco por un talento para ver su descripción y sus requisitos. No se guarda ningún build: es solo una calculadora.</p>
+        <p data-i18n="talentsText">Elige una clase y reparte sus 51 puntos entre los tres árboles. Pasa el cursor o el foco por un talento para ver su descripción y sus requisitos. Tu reparto se guarda en este navegador; no hay códigos de build.</p>
       </div>
       <div id="talentClassTabs" class="talent-classes" role="group" aria-label="Clases" data-i18n-aria-label="talentsClassesAria"></div>
       <div class="talent-bar">
@@ -75,7 +75,7 @@
         <button id="talentReset" class="btn" type="button" data-i18n="talentReset">Restablecer</button>
       </div>
       <div id="talentTrees" class="talent-trees"></div>
-      <p class="talent-hint" data-i18n="talentHint">Clic para sumar un punto. Mayús+clic, clic derecho o pulsación larga para quitarlo.</p>
+      <p class="talent-hint" data-i18n="talentHint">Clic para sumar un punto. Mayús+clic, clic derecho o pulsación larga para quitarlo. El reparto se guarda solo en este navegador.</p>
       <div id="talentTip" class="talent-tip" hidden></div>
     </section>
 
@@ -89,8 +89,8 @@
   <div id="modalRoot"></div>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="data.js?v=8"></script>
-  <script src="talents.js?v=8"></script>
-  <script src="app.js?v=8"></script>
+  <script src="data.js?v=9"></script>
+  <script src="talents.js?v=9"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

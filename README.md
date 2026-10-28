@@ -69,7 +69,8 @@ No hay instalación, build ni `npm install`.
 - **51 puntos** por clase para repartir; los requisitos de fila y de talento previo se respetan: un talento bloqueado no admite puntos hasta cumplirlos.
 - Descripción por rango al pasar el cursor o el foco, con el estado de los requisitos.
 - Clic para sumar; **Mayús+clic**, clic derecho o pulsación larga para quitar. Un punto no se puede retirar si otro talento depende de él.
-- **No guarda builds**: es solo una calculadora en memoria, sin códigos ni enlaces. Al recargar la página empieza de cero.
+- **El reparto se guarda en el navegador** (`localStorage`, clave `rosterplaner.talentos.v1`) y se recupera al recargar, incluida la última clase abierta. Se guarda una distribución por clase.
+- **Sin códigos de build**: no hay enlaces para compartir, builds de la comunidad ni exportación de la calculadora. Restablecer borra solo la distribución de la clase activa.
 
 ### Estadísticas y avisos
 
@@ -82,7 +83,8 @@ No hay instalación, build ni `npm install`.
 
 - **Exportar**: descarga un JSON con los cuatro rosters.
 - **Importar**: restaura un JSON exportado por esta aplicación.
-- **Guardado automático** en `localStorage` con la clave `rosterplaner.local.v1`.
+- **Guardado automático** del roster en `localStorage` con la clave `rosterplaner.local.v1`.
+- **Guardado automático** del reparto de talentos en `localStorage` con la clave `rosterplaner.talentos.v1`.
 
 ### Interfaz
 
@@ -111,7 +113,7 @@ rosterplaner-local/
 
 1. `data.js` define facciones, clases, razas, profesiones, reglas, árboles de Legado, límites y helpers como `isValidCombo` o `buildSegments`. No toca el DOM.
 2. `talents.js` contiene los 27 árboles de talentos con nombres, descripciones por rango, posiciones, rangos máximos y requisitos. Tampoco toca el DOM ni el almacenamiento.
-3. `app.js` arranca en `DOMContentLoaded`, carga el estado de `localStorage`, renderiza y conecta los eventos.
+3. `app.js` arranca en `DOMContentLoaded`, carga el estado del roster y del reparto de talentos desde `localStorage`, renderiza y conecta los eventos.
 4. `index.html` solo contiene la estructura; las partes dinámicas (pestañas, tarjetas, estadísticas, matriz, talentos y modales) las pinta `app.js`.
 
 No hay frameworks, bundler ni peticiones de red.
@@ -142,11 +144,11 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 
 ## Notas y limitaciones
 
-- Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden; usa Exportar para conservar una copia.
+- Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden. Exportar conserva el roster, pero no el reparto de la calculadora.
 - Al abrir con `file://`, algunos navegadores limitan `localStorage`. Si necesitas persistencia garantizada, usa `start.cmd` o el servidor local.
 - El proyecto replica la planificación, no sustituye a los calculadores oficiales de talentos.
 - Los iconos de clases, razas, profesiones y talentos son recursos gráficos de Blizzard Entertainment tomados del catálogo público de iconos de Wowhead. Se guardan en local (`icons/`), así que la web sigue funcionando sin conexión.
-- Los datos de talentos (nombres, descripciones y requisitos) son datos de juego de Forever y están en español. La calculadora no guarda builds ni se sincroniza con el roster: los builds de la ficha de personaje siguen siendo códigos de texto independientes.
+- Los datos de talentos (nombres, descripciones y requisitos) son datos de juego de Forever y están en español. La calculadora guarda la distribución de puntos en este navegador, pero no genera códigos de build ni se sincroniza con el roster: los builds de la ficha de personaje siguen siendo códigos de texto independientes.
 - Las dos razas nuevas (*Nacido del cielo del Alto Orden* y *Nacido del cielo Formavientos*) no tienen icono propio en el juego: usan una ala y un remolino de viento como referencia temática.
 - World of Warcraft y sus nombres son marcas de Blizzard Entertainment.
 
@@ -164,4 +166,5 @@ Se ha verificado en un navegador headless (Chromium + Playwright):
 - Pestañas de reglas, bloqueo de facción en PvP e interfaz solo en español.
 - Exportar JSON e importar JSON.
 - Calculadora de talentos: 9 clases, 27 árboles y 465 talentos; puntos, rangos, requisitos, bloqueo de dependencias, reinicio y cambio de clase.
+- Persistencia del reparto de talentos tras recargar, una distribución por clase y rechazo de datos manipulados (puntos fuera de rango, talentos inexistentes, requisitos incumplidos o más de 51 puntos).
 - Sin errores de consola en los flujos probados.
