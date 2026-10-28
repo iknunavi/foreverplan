@@ -28,10 +28,8 @@
       savePending: "Cambios sin guardar…",
       saveSaved: "Guardado localmente · {time}",
       saveError: "No se pudo guardar (¿modo privado?). Exporta tu roster como copia de seguridad.",
-      share: "Compartir",
       export: "Exportar",
       import: "Importar",
-      print: "Imprimir",
       addCharacter: "Añadir personaje",
       emptyEyebrow: "Aún vacío",
       emptyTitle: "¿A quién juegas desde el 5 de noviembre?",
@@ -137,8 +135,6 @@
       toastDuplicated: "Personaje duplicado.",
       toastImported: "Roster importado.",
       toastExported: "Copia exportada como archivo JSON.",
-      toastShared: "Enlace copiado al portapapeles.",
-      toastCopyFail: "No se pudo copiar. Copia el enlace manualmente.",
       toastMax: "Un roster admite como máximo {n} personajes.",
       toastCopied: "{n} personajes copiados desde {roster}.",
       toastShareImported: "Roster compartido importado ({n} personajes).",
@@ -146,7 +142,6 @@
       confirmReplace: "¿Sustituir todos los rosters guardados por el contenido del archivo?",
       importError: "No se pudo leer el archivo. Debe ser un JSON exportado por esta aplicación.",
       undo: "Deshacer",
-      sharePrompt: "Copia este enlace:",
       pickFactionFirst: "la facción se elige con el primer personaje",
       mixedAllowed: "Alianza y Horda pueden unirse aquí",
       filteredOut: "{n} personajes de la otra facción se omitieron.",
@@ -432,8 +427,6 @@
     document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
       node.setAttribute("aria-label", t(node.dataset.i18nAriaLabel));
     });
-    el.printBtn.title = t("print");
-    el.printBtn.setAttribute("aria-label", t("print"));
   }
 
   function renderTabs() {
@@ -1432,67 +1425,11 @@
 
   /* ---------------- compartir / exportar / importar ---------------- */
 
-  function toBase64Url(text) {
-    const bytes = new TextEncoder().encode(text);
-    let binary = "";
-    bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
-    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-
   function fromBase64Url(text) {
     const padded = text.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - (text.length % 4)) % 4);
     const binary = atob(padded);
     const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
     return new TextDecoder().decode(bytes);
-  }
-
-  async function copyText(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch (error) {
-      try {
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.setAttribute("readonly", "");
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-        document.body.appendChild(area);
-        area.select();
-        const ok = document.execCommand("copy");
-        area.remove();
-        return ok;
-      } catch (fallbackError) {
-        return false;
-      }
-    }
-  }
-
-  async function shareRoster() {
-    const payload = {
-      v: 1,
-      ruleset: active,
-      title: currentRoster().title,
-      characters: currentRoster().characters
-    };
-    const url = `${location.href.split("#")[0]}#kader=${toBase64Url(JSON.stringify(payload))}`;
-
-    try {
-      if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
-        await navigator.share({ title: t("pageTitle"), url });
-        return;
-      }
-    } catch (error) {
-      if (error && error.name === "AbortError") return;
-    }
-
-    const copied = await copyText(url);
-    if (copied) {
-      showToast(t("toastShared"));
-    } else {
-      window.prompt(t("sharePrompt"), url);
-      showToast(t("toastCopyFail"));
-    }
   }
 
   function exportState() {
@@ -1704,20 +1641,16 @@
     el.toast = document.getElementById("toast");
     el.notice = document.getElementById("notice");
     el.addBtn = document.getElementById("addBtn");
-    el.shareBtn = document.getElementById("shareBtn");
     el.exportBtn = document.getElementById("exportBtn");
     el.importFile = document.getElementById("importFile");
-    el.printBtn = document.getElementById("printBtn");
 
     el.tabs.addEventListener("click", (event) => {
       const button = event.target.closest("[data-ruleset]");
       if (button) switchRoster(button.dataset.ruleset);
     });
     el.addBtn.addEventListener("click", () => openCharacterModal());
-    el.shareBtn.addEventListener("click", () => { void shareRoster(); });
     el.exportBtn.addEventListener("click", exportState);
     el.importFile.addEventListener("change", () => { void importFile(); });
-    el.printBtn.addEventListener("click", () => window.print());
     el.rosterTitle.addEventListener("input", () => {
       currentRoster().title = el.rosterTitle.value.slice(0, D.limits.title);
       markDirty();

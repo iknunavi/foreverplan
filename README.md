@@ -70,9 +70,8 @@ No hay instalación, build ni `npm install`.
 - Avisos de clases que faltan, profesiones sin cubrir y profesiones de recolección sin proveedor (materias primas que habría que comprar en la casa de subastas).
 - Contadores de personajes con talentos y con Legado.
 
-### Compartir y copias de seguridad
+### Copias de seguridad
 
-- **Compartir**: genera un enlace con el roster codificado en el fragmento `#kader=...`. Al abrirlo se pregunta si se quiere importar.
 - **Exportar**: descarga un JSON con los cuatro rosters.
 - **Importar**: restaura un JSON exportado por esta aplicación.
 - **Guardado automático** en `localStorage` con la clave `rosterplaner.local.v1`.
@@ -80,7 +79,7 @@ No hay instalación, build ni `npm install`.
 ### Interfaz
 
 - Interfaz **solo en español**.
-- Tema oscuro con detalles dorados, diseño responsive y estilos de impresión.
+- Tema oscuro con detalles dorados y diseño responsive.
 - Referencia visual de las 56 combinaciones raza/clase.
 
 ---
@@ -90,9 +89,9 @@ No hay instalación, build ni `npm install`.
 ```
 rosterplaner-local/
 ├── index.html   Estructura de la página y textos estáticos
-├── styles.css   Tema oscuro, tarjetas, modales, tabla de combinaciones, impresión
+├── styles.css   Tema oscuro, tarjetas, modales y tabla de combinaciones
 ├── data.js      Datos de juego y utilidades (expone window.RP)
-├── app.js       Estado, render, modales, almacenamiento, compartir e importación
+├── app.js       Estado, render, modales, almacenamiento e importación
 ├── start.cmd    Lanzador opcional con servidor local de Python
 └── README.md
 ```
@@ -123,7 +122,6 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 
 - **Alt + ↑/↓** con el foco en el asa de arrastre: mueve la tarjeta.
 - **Esc**: cierra el modal abierto.
-- El botón de impresión usa los estilos `@media print`.
 - Los emojis son marcadores de posición originales; no se han descargado recursos gráficos de terceros.
 
 ---
@@ -132,7 +130,6 @@ Si añades una raza o clase nueva, actualiza también sus combinaciones válidas
 
 - Los datos se guardan **solo en este navegador y en este perfil**. Si borras los datos del sitio, se pierden; usa Exportar para conservar una copia.
 - Al abrir con `file://`, algunos navegadores limitan `localStorage`. Si necesitas persistencia garantizada, usa `start.cmd` o el servidor local.
-- El enlace de compartir puede ser largo si el roster tiene muchos personajes.
 - El proyecto replica la planificación, no sustituye a los calculadores oficiales de talentos.
 - World of Warcraft y sus nombres son marcas de Blizzard Entertainment.
 
@@ -148,5 +145,5 @@ Se ha verificado en un navegador headless (Chromium + Playwright):
 - Reordenación con arrastre y con Alt+flechas, y persistencia tras recargar.
 - Matriz de 10 razas y 56 combinaciones, con nombres traducidos.
 - Pestañas de reglas, bloqueo de facción en PvP e interfaz solo en español.
-- Compartir por enlace `#kader=`, exportar JSON e importar JSON.
+- Exportar JSON e importar JSON.
 - Sin errores de consola en los flujos probados.

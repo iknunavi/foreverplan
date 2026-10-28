@@ -121,8 +121,6 @@ button { cursor: pointer; }
 
 .brand small { display: block; color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
