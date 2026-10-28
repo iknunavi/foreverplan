@@ -4,6 +4,12 @@ Planificador de roster para **World of Warcraft: Forever**, reimplementado desde
 
 > Proyecto no oficial. No está afiliado a Blizzard ni a chromie.de. No contiene código, CSS ni imágenes de chromie.de: la implementación y los datos de juego se han escrito de forma propia con fines educativos y de uso personal.
 
+## Demo en línea
+
+<https://iknunavi.github.io/foreverplan/>
+
+Publicado con **GitHub Pages**. La copia local sigue funcionando igual, sin conexión y sin servidor.
+
 ---
 
 ## Cómo abrirlo
